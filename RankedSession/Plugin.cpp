@@ -15,9 +15,12 @@ namespace RankedSession
 {
 	Plugin::Plugin()
 	{
+		GameResultViewer temp_g = GameResultViewer(this->gameWrapper.get());
+		StatTracker temp_s = StatTracker(this->gameWrapper.get());
+
 		this->renderer = Renderer();
-		this->resultViewer = &GameResultViewer(this->gameWrapper.get());
-		this->statTracker = &StatTracker(this->gameWrapper.get());
+		this->resultViewer = &temp_g;
+		this->statTracker = &temp_s;
 		this->drawStats = false;
 		this->drawResults = false;
 	}
