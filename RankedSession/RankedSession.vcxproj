@@ -28,8 +28,13 @@
     <ClInclude Include="StatTracker.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="GameResultViewer.cpp" />
+    <ClCompile Include="Plugin.cpp" />
     <ClCompile Include="RankedData.cpp" />
     <ClCompile Include="RatingData.cpp" />
+    <ClCompile Include="RatingTracker.cpp" />
+    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="StatTracker.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
