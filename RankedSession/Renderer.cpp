@@ -18,13 +18,117 @@ namespace RankedSession
         this->colorNegative = std::make_shared<LinearColor>(LinearColor());
     }
 
-    void Renderer::RenderSessionInfo(CanvasWrapper* canvas, StatTracker& tracker, RankedPlaylist playlist)
+    void Renderer::RenderSessionInfo(CanvasWrapper* canvas, StatTracker* tracker)
     {
         Vector2 position =
         {
             *posX,
             *posY
         };
+        int count = 0;
+        for (const RankedPlaylist playlist : AvailablePlaylists)
+        {
+            Stats stats = tracker->stats[playlist];
+            if (stats.wins == 0 &&
+                stats.losses == 0)
+            {
+                continue;
+            }
+            this->RenderBox(canvas, stats, position, GetPlaylistName(playlist));
+            if (count++ % 2 == 0)
+            {
+                position.X += 240;
+            }
+            else
+            {
+                position.X = *posX;
+                position.Y += 128;
+            }
+        }
+    }
+
+    void Renderer::RenderAfterGame(CanvasWrapper* canvas, GameResultViewer* viewer, const RankedPlaylist playlist)
+    {
+        Vector2 screen = canvas->GetSize();
+        float fontSize = (float)screen.X / (float)1920;
+
+        if (!viewer->IsPlacement(playlist))
+        {
+            // 1-1
+            canvas->SetColor(233, 238, 240, 255);
+            canvas->SetPosition(Vector2{ int(screen.X * .2) , int(screen.Y * .7) });
+            canvas->DrawString("Next: ", 2 * fontSize, 2 * fontSize);
+
+            // 1-2
+            canvas->SetColor(viewer->colorNext->R, viewer->colorNext->G, viewer->colorNext->B, 255);
+            canvas->SetPosition(Vector2{ int(screen.X * .24) , int(screen.Y * .7) });
+            canvas->DrawString(viewer->tierNext + ": ", 2 * fontSize, 2 * fontSize);
+
+            // 1-3
+            canvas->SetColor(233, 238, 240, 255);
+            canvas->SetPosition(Vector2{ int(screen.X * .37) , int(screen.Y * .7) });
+            canvas->DrawString(std::to_string(viewer->ratingNext) + viewer->differenceNext, 2 * fontSize, 2 * fontSize);
+        }
+        else
+        {
+            // Placement Warning
+            canvas->SetColor(viewer->colorCurrent->R, viewer->colorCurrent->G, viewer->colorCurrent->B, 255);
+            canvas->SetPosition(Vector2{ int(screen.X * .18) , int(screen.Y * .7) });
+            canvas->DrawString("Finish placements for full functionality!", 2 * fontSize, 2 * fontSize);
+        }
+
+        // 2-1
+        canvas->SetColor(233, 238, 240, 255);
+        canvas->SetPosition(Vector2{ int(screen.X * .18) , int(screen.Y * .735) });
+        canvas->DrawString("Current: ", 2 * fontSize, 2 * fontSize);
+
+        // 2-2
+        canvas->SetColor(viewer->colorCurrent->R, viewer->colorCurrent->G, viewer->colorCurrent->B, 255);
+        canvas->SetPosition(Vector2{ int(screen.X * .24) , int(screen.Y * .735) });
+        canvas->DrawString(viewer->tierCurrent + ": ", 2 * fontSize, 2 * fontSize);
+
+        // 2-3
+        canvas->SetColor(233, 238, 240, 255);
+        canvas->SetPosition(Vector2{ int(screen.X * .37) , int(screen.Y * .735) });
+        canvas->DrawString(std::to_string(viewer->ratingCurrent), 2 * fontSize, 2 * fontSize);
+
+        if (!viewer->IsPlacement(playlist))
+        {
+            // 3-1
+            canvas->SetColor(233, 238, 240, 255);
+            canvas->SetPosition(Vector2{ int(screen.X * .175) , int(screen.Y * .77) });
+            canvas->DrawString("Previous: ", 2 * fontSize, 2 * fontSize);
+
+            // 3-2
+            canvas->SetColor(viewer->colorPrevious->R, viewer->colorPrevious->G, viewer->colorPrevious->B, 255);
+            canvas->SetPosition(Vector2{ int(screen.X * .24) , int(screen.Y * .77) });
+            canvas->DrawString(viewer->tierPrevious + ": ", 2 * fontSize, 2 * fontSize);
+
+            // 3-3
+            canvas->SetColor(233, 238, 240, 255);
+            canvas->SetPosition(Vector2{ int(screen.X * .37) , int(screen.Y * .77) });
+            canvas->DrawString(std::to_string(viewer->ratingPrevious) + viewer->differencePrevious, 2 * fontSize, 2 * fontSize);
+        }
+    }
+
+    void Renderer::SetColorByValue(CanvasWrapper* canvas, const float value)
+    {
+        if (value > 0.0f)
+        {
+            canvas->SetColor(*this->colorPositive);
+        }
+        else if (value < 0.0f)
+        {
+            canvas->SetColor(*this->colorNegative);
+        }
+        else
+        {
+            canvas->SetColor(*this->colorLabel);
+        }
+    }
+
+    void Renderer::RenderBox(CanvasWrapper* canvas, Stats stats, const Vector2 position, const std::string playlist)
+    {
         Vector2 boxSize = { 240, 128 };
 
         // DRAW BOX
@@ -33,13 +137,12 @@ namespace RankedSession
         canvas->FillBox(boxSize);
 
         // DRAW CURRENT PLAYLIST
-        Stats stats = tracker.stats[playlist];
         std::stringstream stringStream;
 
         canvas->SetColor(*this->colorTitle);
         canvas->SetPosition(Vector2{ position.X + 10, position.Y + 5 });
 
-        stringStream << GetPlaylistName(playlist);
+        stringStream << playlist;
         canvas->DrawString(stringStream.str());
 
         // DRAW LAST GAME MMR GAIN
@@ -96,90 +199,5 @@ namespace RankedSession
         stringStream.str("");
         stringStream << abs(streak);
         canvas->DrawString(stringStream.str());
-    }
-
-    void Renderer::RenderAfterGame(CanvasWrapper* canvas, GameResultViewer& viewer, RankedPlaylist playlist)
-    {
-        if (!viewer.shouldDraw)
-        {
-            return;
-        }
-        Vector2 screen = canvas->GetSize();
-
-        float fontSize = (float)screen.X / (float)1920;
-
-        if (!viewer.IsPlacement(playlist))
-        {
-            // 1-1
-            canvas->SetColor(233, 238, 240, 255);
-            canvas->SetPosition(Vector2{ int(screen.X * .2) , int(screen.Y * .7) });
-            canvas->DrawString("Next: ", 2 * fontSize, 2 * fontSize);
-
-            // 1-2
-            canvas->SetColor(viewer.colorNext->R, viewer.colorNext->G, viewer.colorNext->B, 255);
-            canvas->SetPosition(Vector2{ int(screen.X * .24) , int(screen.Y * .7) });
-            canvas->DrawString(viewer.tierNext + ": ", 2 * fontSize, 2 * fontSize);
-
-            // 1-3
-            canvas->SetColor(233, 238, 240, 255);
-            canvas->SetPosition(Vector2{ int(screen.X * .37) , int(screen.Y * .7) });
-            canvas->DrawString(std::to_string(viewer.ratingNext) + viewer.differenceNext, 2 * fontSize, 2 * fontSize);
-        }
-        else
-        {
-            // Placement Warning
-            canvas->SetColor(viewer.colorCurrent->R, viewer.colorCurrent->G, viewer.colorCurrent->B, 255);
-            canvas->SetPosition(Vector2{ int(screen.X * .18) , int(screen.Y * .7) });
-            canvas->DrawString("Finish placements for full functionality!", 2 * fontSize, 2 * fontSize);
-        }
-
-        // 2-1
-        canvas->SetColor(233, 238, 240, 255);
-        canvas->SetPosition(Vector2{ int(screen.X * .18) , int(screen.Y * .735) });
-        canvas->DrawString("Current: ", 2 * fontSize, 2 * fontSize);
-
-        // 2-2
-        canvas->SetColor(viewer.colorCurrent->R, viewer.colorCurrent->G, viewer.colorCurrent->B, 255);
-        canvas->SetPosition(Vector2{ int(screen.X * .24) , int(screen.Y * .735) });
-        canvas->DrawString(viewer.tierCurrent + ": ", 2 * fontSize, 2 * fontSize);
-
-        // 2-3
-        canvas->SetColor(233, 238, 240, 255);
-        canvas->SetPosition(Vector2{ int(screen.X * .37) , int(screen.Y * .735) });
-        canvas->DrawString(std::to_string(viewer.ratingCurrent), 2 * fontSize, 2 * fontSize);
-
-        if (!viewer.IsPlacement(playlist))
-        {
-            // 3-1
-            canvas->SetColor(233, 238, 240, 255);
-            canvas->SetPosition(Vector2{ int(screen.X * .175) , int(screen.Y * .77) });
-            canvas->DrawString("Previous: ", 2 * fontSize, 2 * fontSize);
-
-            // 3-2
-            canvas->SetColor(viewer.colorPrevious->R, viewer.colorPrevious->G, viewer.colorPrevious->B, 255);
-            canvas->SetPosition(Vector2{ int(screen.X * .24) , int(screen.Y * .77) });
-            canvas->DrawString(viewer.tierPrevious + ": ", 2 * fontSize, 2 * fontSize);
-
-            // 3-3
-            canvas->SetColor(233, 238, 240, 255);
-            canvas->SetPosition(Vector2{ int(screen.X * .37) , int(screen.Y * .77) });
-            canvas->DrawString(std::to_string(viewer.ratingPrevious) + viewer.differencePrevious, 2 * fontSize, 2 * fontSize);
-        }
-    }
-
-    void Renderer::SetColorByValue(CanvasWrapper* canvas, float value)
-    {
-        if (value > 0.0f)
-        {
-            canvas->SetColor(*this->colorPositive);
-        }
-        else if (value < 0.0f)
-        {
-            canvas->SetColor(*this->colorNegative);
-        }
-        else
-        {
-            canvas->SetColor(*this->colorLabel);
-        }
     }
 }

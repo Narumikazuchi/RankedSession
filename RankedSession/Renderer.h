@@ -21,10 +21,11 @@ namespace RankedSession
 		std::shared_ptr<LinearColor> colorNegative;
 
 		Renderer();
-		void RenderSessionInfo(CanvasWrapper* canvas, StatTracker& tracker, RankedPlaylist playlist);
-		void RenderAfterGame(CanvasWrapper* canvas, GameResultViewer& viewer, RankedPlaylist playlist);
+		void RenderSessionInfo(CanvasWrapper* canvas, StatTracker* tracker);
+		void RenderAfterGame(CanvasWrapper* canvas, GameResultViewer* viewer, const RankedPlaylist playlist);
 
 	private:
-		void SetColorByValue(CanvasWrapper* canvas, float value);
+		void SetColorByValue(CanvasWrapper* canvas, const float value);
+		void RenderBox(CanvasWrapper* canvas, Stats stats, const Vector2 position, const std::string playlist);
 	};
 }

@@ -56,6 +56,7 @@ namespace RankedSession
 	std::string GetPlaylistName(const RankedSession::RankedPlaylist playlist);
 
 	extern std::map<Rank, RankInfo> RankInfoDatabase;
+	extern std::vector<RankedPlaylist> AvailablePlaylists;
 }
 
 

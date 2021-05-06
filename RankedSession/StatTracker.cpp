@@ -60,14 +60,10 @@ namespace RankedSession
 	{
 		UniqueIDWrapper id = wrapper->GetUniqueID();
 		MMRWrapper mmr = wrapper->GetMMRWrapper();
-		this->stats.insert(std::pair<RankedPlaylist, Stats>(RankedPlaylist::ONES, Stats(&mmr, id, RankedPlaylist::ONES)));
-		this->stats.insert(std::pair<RankedPlaylist, Stats>(RankedPlaylist::TWOS, Stats(&mmr, id, RankedPlaylist::TWOS)));
-		this->stats.insert(std::pair<RankedPlaylist, Stats>(RankedPlaylist::THREES, Stats(&mmr, id, RankedPlaylist::THREES)));
-		this->stats.insert(std::pair<RankedPlaylist, Stats>(RankedPlaylist::HOOPS, Stats(&mmr, id, RankedPlaylist::HOOPS)));
-		this->stats.insert(std::pair<RankedPlaylist, Stats>(RankedPlaylist::RUMBLE, Stats(&mmr, id, RankedPlaylist::RUMBLE)));
-		this->stats.insert(std::pair<RankedPlaylist, Stats>(RankedPlaylist::DROPSHOT, Stats(&mmr, id, RankedPlaylist::DROPSHOT)));
-		this->stats.insert(std::pair<RankedPlaylist, Stats>(RankedPlaylist::SNOWDAY, Stats(&mmr, id, RankedPlaylist::SNOWDAY)));
-		this->stats.insert(std::pair<RankedPlaylist, Stats>(RankedPlaylist::TOURNAMENT, Stats(&mmr, id, RankedPlaylist::TOURNAMENT)));
+		for (const RankedPlaylist playlist : AvailablePlaylists)
+		{
+			this->stats.insert(std::pair<RankedPlaylist, Stats>(playlist, Stats(&mmr, id, playlist)));
+		}
 	}
 
 	void StatTracker::Update(GameWrapper* wrapper, const RankedPlaylist playlist)

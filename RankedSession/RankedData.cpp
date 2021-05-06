@@ -28,4 +28,16 @@ namespace RankedSession
         { Rank::GrandChamp3      ,{{ 244, 56, 236  }, "Grand Champion 3"}},
         { Rank::SuperSonicLegend ,{{ 224, 224, 224 }, "Super Sonic Legend"}}
     };
+
+    std::vector<RankedPlaylist> AvailablePlaylists
+    {
+        RankedPlaylist::ONES,
+        RankedPlaylist::TWOS,
+        RankedPlaylist::THREES,
+        RankedPlaylist::HOOPS,
+        RankedPlaylist::RUMBLE,
+        RankedPlaylist::DROPSHOT,
+        RankedPlaylist::SNOWDAY,
+        RankedPlaylist::TOURNAMENT
+    };
 }
