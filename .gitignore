@@ -30,3 +30,12 @@
 *.exe
 *.out
 *.app
+
+# Other uneccessary build components
+*.tlog
+*.recipe
+*.iobj
+*.ipdb
+*.log
+*.pdb
+*.exp
