@@ -108,7 +108,7 @@ namespace RankedSession
 
         float fontSize = (float)screen.X / (float)1920;
 
-        if (!viewer.IsPlacement())
+        if (!viewer.IsPlacement(playlist))
         {
             // 1-1
             canvas->SetColor(233, 238, 240, 255);
@@ -148,7 +148,7 @@ namespace RankedSession
         canvas->SetPosition(Vector2{ int(screen.X * .37) , int(screen.Y * .735) });
         canvas->DrawString(std::to_string(viewer.ratingCurrent), 2 * fontSize, 2 * fontSize);
 
-        if (!viewer.IsPlacement())
+        if (!viewer.IsPlacement(playlist))
         {
             // 3-1
             canvas->SetColor(233, 238, 240, 255);

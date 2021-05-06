@@ -1,6 +1,7 @@
 #pragma once
 
 #include "bakkesmod/plugin/bakkesmodplugin.h"
+#include "RatingData.h"
 
 namespace RankedSession
 {
@@ -21,6 +22,18 @@ namespace RankedSession
 		int ratingCurrent;
 		int ratingNext;
 
-		bool IsPlacement();
+		GameResultViewer(GameWrapper* wrapper);
+		bool IsPlacement(const RankedPlaylist playlist);
+		void Update(const RankedPlaylist playlist);
+
+	private:
+		GameWrapper* wrapper;
+
+		DivisionData GetDivisionData(const RankedPlaylist playlist, const Rank rank, const int division);
+		std::string GetRankName(const int tier, const int division);
+		void SetRankColor(LinearColor* color, int tier);
+		void SetDifferenceString(std::string* ptr, int difference);
+		int GetRatingLowerBound(const RankedPlaylist playlist, const int tier, const int division);
+		int GetRatingUpperBound(const RankedPlaylist playlist, const int tier, const int division);
 	};
 }
