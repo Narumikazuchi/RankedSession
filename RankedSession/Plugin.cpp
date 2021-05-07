@@ -29,41 +29,41 @@ namespace RankedSession
 		this->renderer.colorBackground->R = 0.f;
 		this->renderer.colorBackground->G = 0.f;
 		this->renderer.colorBackground->B = 0.f;
-		this->renderer.colorBackground->A = 75.f;
+		this->renderer.colorBackground->A = 160.f;
 		this->cvarManager->getCvar(CVAR_NAME_COLOR_BACKGROUND).setValue(*this->renderer.colorBackground);
 
 		this->renderer.colorTitle->R = 255.f;
 		this->renderer.colorTitle->G = 255.f;
 		this->renderer.colorTitle->B = 255.f;
-		this->renderer.colorTitle->A = 127.f;
+		this->renderer.colorTitle->A = 224.f;
 		this->cvarManager->getCvar(CVAR_NAME_COLOR_TITLE).setValue(*this->renderer.colorTitle);
 
 		this->renderer.colorLabel->R = 255.f;
 		this->renderer.colorLabel->G = 255.f;
 		this->renderer.colorLabel->B = 255.f;
-		this->renderer.colorLabel->A = 150.f;
+		this->renderer.colorLabel->A = 224.f;
 		this->cvarManager->getCvar(CVAR_NAME_COLOR_LABEL).setValue(*this->renderer.colorLabel);
 
 		this->renderer.colorPositive->R = 95.f;
 		this->renderer.colorPositive->G = 232.f;
 		this->renderer.colorPositive->B = 95.f;
-		this->renderer.colorPositive->A = 127.f;
+		this->renderer.colorPositive->A = 224.f;
 		this->cvarManager->getCvar(CVAR_NAME_COLOR_POSITIVE).setValue(*this->renderer.colorPositive);
 
 		this->renderer.colorNegative->R = 232.f;
 		this->renderer.colorNegative->G = 95.f;
 		this->renderer.colorNegative->B = 95.f;
-		this->renderer.colorNegative->A = 127.f;
+		this->renderer.colorNegative->A = 224.f;
 		this->cvarManager->getCvar(CVAR_NAME_COLOR_NEGATIVE).setValue(*this->renderer.colorNegative);
 	}
 
 	void Plugin::onLoad()
 	{
-		this->cvarManager->registerCvar(CVAR_NAME_COLOR_BACKGROUND, "(0, 0, 0, 75)", "Background color", false, false, 0, false, 255, true).bindTo(this->renderer.colorBackground);
-		this->cvarManager->registerCvar(CVAR_NAME_COLOR_TITLE, "(255, 255, 255, 127)", "Title color", false, false, 0, false, 255, true).bindTo(this->renderer.colorTitle);
-		this->cvarManager->registerCvar(CVAR_NAME_COLOR_LABEL, "(255, 255, 255, 150)", "Label color", false, false, 0, false, 255, true).bindTo(this->renderer.colorLabel);
-		this->cvarManager->registerCvar(CVAR_NAME_COLOR_POSITIVE, "(95, 232, 95, 127)", "Positive color", false, false, 0, false, 255, true).bindTo(this->renderer.colorPositive);
-		this->cvarManager->registerCvar(CVAR_NAME_COLOR_NEGATIVE, "(232, 95, 95, 127)", "Negative color", false, false, 0, false, 255, true).bindTo(this->renderer.colorNegative);
+		this->cvarManager->registerCvar(CVAR_NAME_COLOR_BACKGROUND, "(0, 0, 0, 160)", "Background color", false, false, 0, false, 255, true).bindTo(this->renderer.colorBackground);
+		this->cvarManager->registerCvar(CVAR_NAME_COLOR_TITLE, "(255, 255, 255, 224)", "Title color", false, false, 0, false, 255, true).bindTo(this->renderer.colorTitle);
+		this->cvarManager->registerCvar(CVAR_NAME_COLOR_LABEL, "(255, 255, 255, 224)", "Label color", false, false, 0, false, 255, true).bindTo(this->renderer.colorLabel);
+		this->cvarManager->registerCvar(CVAR_NAME_COLOR_POSITIVE, "(95, 232, 95, 224)", "Positive color", false, false, 0, false, 255, true).bindTo(this->renderer.colorPositive);
+		this->cvarManager->registerCvar(CVAR_NAME_COLOR_NEGATIVE, "(232, 95, 95, 224)", "Negative color", false, false, 0, false, 255, true).bindTo(this->renderer.colorNegative);
 
 		this->cvarManager->registerNotifier(CVAR_NAME_RESET_COLORS, [this](std::vector<std::string> params)
 		{

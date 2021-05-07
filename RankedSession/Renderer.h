@@ -26,6 +26,6 @@ namespace RankedSession
 
 	private:
 		void SetColorByValue(CanvasWrapper* canvas, const float value);
-		void RenderBox(CanvasWrapper* canvas, Stats stats, const Vector2 position, const std::string playlist);
+		void RenderBox(CanvasWrapper* canvas, Stats* stats, const Vector2 position, const std::string playlist);
 	};
 }

@@ -13,6 +13,7 @@ namespace RankedSession
 		UniqueIDWrapper id = wrapper->GetUniqueID();
 		MMRWrapper mmrWrapper = wrapper->GetMMRWrapper();
 		float mmr = mmrWrapper.GetPlayerMMR(id, (int)playlist);
+		Rank rank = (Rank)mmrWrapper.GetPlayerRank(id, (int)playlist).Tier;
 		if (this->currentRating == mmr)
 		{
 			return RatingRequestResult::SAME_VALUE;
@@ -26,7 +27,6 @@ namespace RankedSession
 		this->beforeRating = this->currentRating;
 		this->beforeRank = this->currentRank;
 
-		Rank rank = (Rank)mmrWrapper.GetPlayerRank(id, (int)playlist).Tier;
 		this->currentRating = mmr;
 		this->currentRank = rank;
 		return this->currentRating > this->beforeRating ? RatingRequestResult::SUCCESS_WIN : RatingRequestResult::SUCCESS_LOSE;

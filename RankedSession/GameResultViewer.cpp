@@ -159,6 +159,11 @@ namespace RankedSession
 	
 	void GameResultViewer::SetRankColor(LinearColor* color, int tier)
 	{
+		if (color == nullptr)
+		{
+			return;
+		}
+
 		Rank rank = (Rank)tier;
 		if (rank < Rank::Unranked ||
 			rank > Rank::SuperSonicLegend)
@@ -176,6 +181,11 @@ namespace RankedSession
 
 	void GameResultViewer::SetDifferenceString(std::string* ptr, int difference)
 	{
+		if (ptr == nullptr)
+		{
+			return;
+		}
+
 		if (difference >= 0)
 		{
 			difference = abs(difference);

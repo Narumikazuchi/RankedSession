@@ -16,7 +16,7 @@ namespace RankedSession
 	struct Stats
 	{
 	public:
-		RatingTracker rating;
+		RatingTracker* rating;
 		int wins;
 		int losses;
 		int streak;
@@ -30,7 +30,7 @@ namespace RankedSession
 	class StatTracker
 	{
 	public:
-		std::map<RankedPlaylist, Stats> stats;
+		std::map<RankedPlaylist, Stats*> stats;
 		bool isInitialized;
 
 		StatTracker(GameWrapper* wrapper);

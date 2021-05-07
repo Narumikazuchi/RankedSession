@@ -1,4 +1,3 @@
-
 #include <sstream>
 #include "bakkesmod/wrappers/cvarmanagerwrapper.h"
 #include "bakkesmod/wrappers/canvaswrapper.h"
@@ -34,9 +33,9 @@ namespace RankedSession
         int count = 0;
         for (const RankedPlaylist playlist : AvailablePlaylists)
         {
-            Stats stats = tracker->stats[playlist];
-            if (stats.wins == 0 &&
-                stats.losses == 0)
+            Stats* stats = tracker->stats[playlist];
+            if (stats->wins == 0 &&
+                stats->losses == 0)
             {
                 continue;
             }
@@ -143,7 +142,7 @@ namespace RankedSession
         }
     }
 
-    void Renderer::RenderBox(CanvasWrapper* canvas, Stats stats, const Vector2 position, const std::string playlist)
+    void Renderer::RenderBox(CanvasWrapper* canvas, Stats* stats, const Vector2 position, const std::string playlist)
     {
         Vector2 boxSize = { 240, 128 };
 
@@ -156,7 +155,7 @@ namespace RankedSession
         std::stringstream stringStream;
 
         canvas->SetColor(*this->colorTitle);
-        canvas->SetPosition(Vector2{ position.X + 10, position.Y + 5 });
+        canvas->SetPosition(Vector2{ position.X + 42, position.Y + 5 });
 
         stringStream << playlist;
         canvas->DrawString(stringStream.str());
@@ -166,24 +165,24 @@ namespace RankedSession
         canvas->SetPosition(Vector2{ position.X + 10, position.Y + 21 });
         canvas->DrawString("Current MMR:");
 
-        float mmrGain = stats.rating.GetLastGameDifference();
+        float mmrGain = stats->rating->GetLastGameDifference();
         SetColorByValue(canvas, mmrGain);
-        canvas->SetPosition(Vector2{ position.X + 88, position.Y + 21 });
+        canvas->SetPosition(Vector2{ position.X + 104, position.Y + 21 });
 
         stringStream.str("");
-        stats.FormatStream(stringStream, StreamFormatStyle::LastGameDifference);
+        stats->FormatStream(stringStream, StreamFormatStyle::LastGameDifference);
         canvas->DrawString(stringStream.str());
         // DRAW SESSION MMR GAIN
         canvas->SetColor(*this->colorLabel);
         canvas->SetPosition(Vector2{ position.X + 10, position.Y + 37 });
         canvas->DrawString("Start MMR:");
 
-        mmrGain = stats.rating.GetSessionDifference();
+        mmrGain = stats->rating->GetSessionDifference();
         SetColorByValue(canvas, mmrGain);
-        canvas->SetPosition(Vector2{ position.X + 88, position.Y + 37 });
+        canvas->SetPosition(Vector2{ position.X + 104, position.Y + 37 });
 
         stringStream.str("");
-        stats.FormatStream(stringStream, StreamFormatStyle::InitialDifference);
+        stats->FormatStream(stringStream, StreamFormatStyle::InitialDifference);
         canvas->DrawString(stringStream.str());
 
         // DRAW WINS
@@ -192,8 +191,8 @@ namespace RankedSession
         canvas->DrawString("Wins:");
 
         canvas->SetColor(*this->colorPositive);
-        canvas->SetPosition(Vector2{ position.X + 88, position.Y + 53 });
-        canvas->DrawString(std::to_string(stats.wins));
+        canvas->SetPosition(Vector2{ position.X + 104, position.Y + 53 });
+        canvas->DrawString(std::to_string(stats->wins));
 
         // DRAW LOSSES
         canvas->SetColor(*this->colorLabel);
@@ -201,17 +200,17 @@ namespace RankedSession
         canvas->DrawString("Losses:");
 
         canvas->SetColor(*this->colorNegative);
-        canvas->SetPosition(Vector2{ position.X + 88, position.Y + 69 });
-        canvas->DrawString(std::to_string(stats.losses));
+        canvas->SetPosition(Vector2{ position.X + 104, position.Y + 69 });
+        canvas->DrawString(std::to_string(stats->losses));
 
         // DRAW STREAK
         canvas->SetColor(*this->colorLabel);
         canvas->SetPosition(Vector2{ position.X + 10, position.Y + 85 });
         canvas->DrawString("Streak:");
 
-        int streak = stats.streak;
+        int streak = stats->streak;
         SetColorByValue(canvas, static_cast<float>(streak));
-        canvas->SetPosition(Vector2{ position.X + 88, position.Y + 85 });
+        canvas->SetPosition(Vector2{ position.X + 104, position.Y + 85 });
         stringStream.str("");
         stringStream << abs(streak);
         canvas->DrawString(stringStream.str());
