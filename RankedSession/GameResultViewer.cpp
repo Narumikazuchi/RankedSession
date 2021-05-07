@@ -149,7 +149,7 @@ namespace RankedSession
 		Rank realRank = (Rank)(tier);
 		std::string rankName = RankInfoDatabase[realRank].name;
 		if (realRank != Rank::Unranked &&
-			realRank != Rank::SuperSonicLegend)
+			realRank != Rank::SupersonicLegend)
 		{
 			rankName += " Div " + std::to_string(division + 1);
 		}
@@ -166,7 +166,7 @@ namespace RankedSession
 
 		Rank rank = (Rank)tier;
 		if (rank < Rank::Unranked ||
-			rank > Rank::SuperSonicLegend)
+			rank > Rank::SupersonicLegend)
 		{
 			color->R = 0;
 			color->G = 0;

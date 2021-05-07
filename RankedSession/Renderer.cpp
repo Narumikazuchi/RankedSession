@@ -1,12 +1,14 @@
 #include <sstream>
-#include "bakkesmod/wrappers/cvarmanagerwrapper.h"
 #include "bakkesmod/wrappers/canvaswrapper.h"
 #include "bakkesmod/wrappers/MMRWrapper.h"
+#include "RankedData.h"
 #include "Renderer.h"
 
 namespace RankedSession
 {
-    Renderer::Renderer()
+    const Vector2 boxSize = { 240, 208 };
+
+    Renderer::Renderer(GameWrapper* wrapper)
     {
         this->posX = std::make_shared<int>(0);
         this->posY = std::make_shared<int>(0);
@@ -15,6 +17,14 @@ namespace RankedSession
         this->colorLabel = std::make_shared<LinearColor>(LinearColor());
         this->colorPositive = std::make_shared<LinearColor>(LinearColor());
         this->colorNegative = std::make_shared<LinearColor>(LinearColor());
+        if (wrapper == nullptr)
+        {
+            this->wrapper = nullptr;
+            this->isInitialized = false;
+            return;
+        }
+        this->wrapper = wrapper;
+        this->isInitialized = true;
     }
 
     void Renderer::RenderSessionInfo(CanvasWrapper* canvas, StatTracker* tracker)
@@ -43,12 +53,12 @@ namespace RankedSession
             this->RenderBox(canvas, stats, position, GetPlaylistName(playlist));
             if (count++ % 2 == 0)
             {
-                position.X += 240;
+                position.X += boxSize.X;
             }
             else
             {
                 position.X = *posX;
-                position.Y += 128;
+                position.Y += boxSize.Y;
             }
         }
     }
@@ -125,6 +135,14 @@ namespace RankedSession
         }
     }
 
+    void Renderer::PreLoadImages(GameWrapper* wrapper)
+    {
+        for (int i = 0; i < 22; i++)
+        {
+            RankInfoDatabase[(Rank)i].image = std::make_shared<ImageWrapper>(wrapper->GetDataFolder().string() + "\\RankedSession\\" + RankInfoDatabase[(Rank)i].name + ".png", true);
+        }
+    }
+
     //
     // Private
     //
@@ -147,8 +165,6 @@ namespace RankedSession
 
     void Renderer::RenderBox(CanvasWrapper* canvas, Stats* stats, const Vector2 position, const std::string playlist)
     {
-        Vector2 boxSize = { 240, 128 };
-
         // DRAW BOX
         canvas->SetColor(*this->colorBackground);
         canvas->SetPosition(position);
@@ -158,7 +174,7 @@ namespace RankedSession
         std::stringstream stringStream;
 
         canvas->SetColor(*this->colorTitle);
-        canvas->SetPosition(Vector2{ position.X + 42, position.Y + 5 });
+        canvas->SetPosition(Vector2{ position.X + 64, position.Y + 5 });
 
         stringStream << playlist;
         canvas->DrawString(stringStream.str());
@@ -217,5 +233,26 @@ namespace RankedSession
         stringStream.str("");
         stringStream << abs(streak);
         canvas->DrawString(stringStream.str());
+
+        // DRAW INITIAL RANK
+        std::shared_ptr<ImageWrapper> image = RankInfoDatabase[stats->rating->initialRank].image;
+        canvas->SetColor(LinearColor{ 255, 255, 255 });
+        canvas->SetPosition(Vector2{ position.X + 10, position.Y + 101 });
+        if (image->IsLoadedForCanvas())
+        {
+            canvas->DrawTexture(image.get(), 1.f);
+        }
+
+        canvas->SetPosition(Vector2{ position.X + 110, position.Y + 151 });
+        canvas->DrawString(">", 2.f, 2.f);
+
+        // DRAW CURRENT RANK
+        image = RankInfoDatabase[stats->rating->currentRank].image;
+        canvas->SetColor(LinearColor{ 255, 255, 255 });
+        canvas->SetPosition(Vector2{ position.X + 130, position.Y + 101 });
+        if (image->IsLoadedForCanvas())
+        {
+            canvas->DrawTexture(image.get(), 1.f);
+        }
     }
 }

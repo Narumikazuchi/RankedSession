@@ -8,19 +8,19 @@ namespace RankedSession
 {
 	enum class RankedPlaylist
 	{
-		ONES = 10,
-		TWOS = 11,
-		THREES = 13,
-		HOOPS = 27,
-		RUMBLE = 28,
-		DROPSHOT = 29,
-		SNOWDAY = 30,
+		RANKED_DUEL = 10,
+		RANKED_DOUBLE = 11,
+		RANKED_STANDARD = 13,
+		RANKED_HOOPS = 27,
+		RANKED_RUMBLE = 28,
+		RANKED_DROPSHOT = 29,
+		RANKED_SNOWDAY = 30,
 		TOURNAMENT = 34
 	};
 
 	enum class Rank
 	{
-		SuperSonicLegend = 22,
+		SupersonicLegend = 22,
 		GrandChamp3 = 21,
 		GrandChamp2 = 20,
 		GrandChamp1 = 19,
@@ -51,6 +51,7 @@ namespace RankedSession
 	public:
 		LinearColor color;
 		std::string name;
+		std::shared_ptr<ImageWrapper> image;
 	};
 
 	std::string GetPlaylistName(const RankedSession::RankedPlaylist playlist);
@@ -64,19 +65,19 @@ inline std::string RankedSession::GetPlaylistName(const RankedSession::RankedPla
 {
 	switch (playlist)
 	{
-	case RankedPlaylist::ONES:
+	case RankedPlaylist::RANKED_DUEL:
 		return "1v1 Duels";
-	case RankedPlaylist::TWOS:
+	case RankedPlaylist::RANKED_DOUBLE:
 		return "2v2 Doubles";
-	case RankedPlaylist::THREES:
+	case RankedPlaylist::RANKED_STANDARD:
 		return "3v3 Standard";
-	case RankedPlaylist::HOOPS:
+	case RankedPlaylist::RANKED_HOOPS:
 		return "2v2 Hoops";
-	case RankedPlaylist::RUMBLE:
+	case RankedPlaylist::RANKED_RUMBLE:
 		return "3v3 Rumble";
-	case RankedPlaylist::DROPSHOT:
+	case RankedPlaylist::RANKED_DROPSHOT:
 		return "3v3 Dropshot";
-	case RankedPlaylist::SNOWDAY:
+	case RankedPlaylist::RANKED_SNOWDAY:
 		return "3v3 Snowday";
 	case RankedPlaylist::TOURNAMENT:
 		return "3v3 Tournaments";
