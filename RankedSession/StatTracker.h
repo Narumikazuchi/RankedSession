@@ -31,8 +31,12 @@ namespace RankedSession
 	{
 	public:
 		std::map<RankedPlaylist, Stats> stats;
+		bool isInitialized;
 
 		StatTracker(GameWrapper* wrapper);
-		void Update(GameWrapper* wrapper, const RankedPlaylist playlist);
+		void Update(const RankedPlaylist playlist);
+
+	private:
+		GameWrapper* wrapper;
 	};
 }

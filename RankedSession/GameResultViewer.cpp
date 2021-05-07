@@ -4,6 +4,14 @@ namespace RankedSession
 {
 	GameResultViewer::GameResultViewer(GameWrapper* wrapper)
 	{
+		if (wrapper == nullptr)
+		{
+			this->isInitialized = false;
+		}
+		else
+		{
+			this->isInitialized = true;
+		}
 		this->wrapper = wrapper;
 		this->shouldDraw = false;
 		this->colorPrevious = std::make_shared<LinearColor>(LinearColor());
@@ -16,6 +24,10 @@ namespace RankedSession
 
 	bool GameResultViewer::IsPlacement(const RankedPlaylist playlist)
 	{
+		if (!this->isInitialized)
+		{
+			return true;
+		}
 		MMRWrapper mmr = this->wrapper->GetMMRWrapper();
 		UniqueIDWrapper id = this->wrapper->GetUniqueID();
 		SkillRank rank = mmr.GetPlayerRank(id, (int)playlist);
@@ -24,6 +36,11 @@ namespace RankedSession
 
 	void GameResultViewer::Update(const RankedPlaylist playlist)
 	{
+		if (!this->isInitialized)
+		{
+			return;
+		}
+
 		// Ranked Check
 		MMRWrapper mmr = this->wrapper->GetMMRWrapper();
 		if (!mmr.IsRanked((int)playlist))
@@ -100,7 +117,7 @@ namespace RankedSession
 	}
 
 	//
-	//
+	// Private
 	//
 
 	DivisionData GameResultViewer::GetDivisionData(const RankedPlaylist playlist, const Rank rank, const int division)

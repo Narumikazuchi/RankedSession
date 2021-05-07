@@ -5,6 +5,11 @@ namespace RankedSession
 {
 	RatingRequestResult RatingTracker::RequestUpdate(GameWrapper* wrapper, const RankedPlaylist playlist)
 	{
+		if (wrapper == nullptr)
+		{
+			return RatingRequestResult::NOT_SYNCED;
+		}
+
 		UniqueIDWrapper id = wrapper->GetUniqueID();
 		MMRWrapper mmrWrapper = wrapper->GetMMRWrapper();
 		float mmr = mmrWrapper.GetPlayerMMR(id, (int)playlist);

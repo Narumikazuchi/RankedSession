@@ -39,3 +39,5 @@
 *.log
 *.pdb
 *.exp
+*.ilk
+*.idb

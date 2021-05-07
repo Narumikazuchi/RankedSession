@@ -9,6 +9,7 @@ namespace RankedSession
 	{
 	public:
 		bool shouldDraw;
+		bool isInitialized;
 
 		std::shared_ptr<LinearColor> colorPrevious;
 		std::shared_ptr<LinearColor> colorCurrent;

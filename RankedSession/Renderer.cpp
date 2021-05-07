@@ -20,6 +20,12 @@ namespace RankedSession
 
     void Renderer::RenderSessionInfo(CanvasWrapper* canvas, StatTracker* tracker)
     {
+        if (canvas == nullptr ||
+            tracker == nullptr)
+        {
+            return;
+        }
+
         Vector2 position =
         {
             *posX,
@@ -49,6 +55,12 @@ namespace RankedSession
 
     void Renderer::RenderAfterGame(CanvasWrapper* canvas, GameResultViewer* viewer, const RankedPlaylist playlist)
     {
+        if (canvas == nullptr ||
+            viewer == nullptr)
+        {
+            return;
+        }
+
         Vector2 screen = canvas->GetSize();
         float fontSize = (float)screen.X / (float)1920;
 
@@ -110,6 +122,10 @@ namespace RankedSession
             canvas->DrawString(std::to_string(viewer->ratingPrevious) + viewer->differencePrevious, 2 * fontSize, 2 * fontSize);
         }
     }
+
+    //
+    // Private
+    //
 
     void Renderer::SetColorByValue(CanvasWrapper* canvas, const float value)
     {

@@ -20,8 +20,13 @@ namespace RankedSession
 
 	Stats::Stats(MMRWrapper* wrapper, const UniqueIDWrapper id, const RankedPlaylist playlist)
 	{
-		float initial = wrapper->GetPlayerMMR(id, (int)playlist);
-		Rank rank = (Rank)wrapper->GetPlayerRank(id, (int)playlist).Tier;
+		float initial = 0.f;
+		Rank rank = Rank::Unranked;
+		if (wrapper != nullptr)
+		{
+			float initial = wrapper->GetPlayerMMR(id, (int)playlist);
+			Rank rank = (Rank)wrapper->GetPlayerRank(id, (int)playlist).Tier;
+		}
 		this->rating = RatingTracker();
 		this->rating.initialRating = initial;
 		this->rating.beforeRating = initial;
@@ -58,20 +63,32 @@ namespace RankedSession
 
 	StatTracker::StatTracker(GameWrapper* wrapper)
 	{
-		UniqueIDWrapper id = wrapper->GetUniqueID();
-		MMRWrapper mmr = wrapper->GetMMRWrapper();
+		if (wrapper == nullptr)
+		{
+			this->isInitialized = false;
+			this->wrapper = nullptr;
+			return;
+		}
+		this->wrapper = wrapper;
+		this->isInitialized = true;
+		UniqueIDWrapper id = this->wrapper->GetUniqueID();
+		MMRWrapper mmr = this->wrapper->GetMMRWrapper();
 		for (const RankedPlaylist playlist : AvailablePlaylists)
 		{
 			this->stats.insert(std::pair<RankedPlaylist, Stats>(playlist, Stats(&mmr, id, playlist)));
 		}
 	}
 
-	void StatTracker::Update(GameWrapper* wrapper, const RankedPlaylist playlist)
+	void StatTracker::Update(const RankedPlaylist playlist)
 	{
+		if (!this->isInitialized)
+		{
+			return;
+		}
 		Stats stats = this->stats[playlist];
-		UniqueIDWrapper id = wrapper->GetUniqueID();
-		MMRWrapper mmr = wrapper->GetMMRWrapper();
-		RatingRequestResult result = stats.rating.RequestUpdate(wrapper, playlist);
+		UniqueIDWrapper id = this->wrapper->GetUniqueID();
+		MMRWrapper mmr = this->wrapper->GetMMRWrapper();
+		RatingRequestResult result = stats.rating.RequestUpdate(this->wrapper, playlist);
 		if (result == RatingRequestResult::SUCCESS_WIN)
 		{
 			stats.wins++;
