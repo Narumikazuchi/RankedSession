@@ -122,10 +122,15 @@ namespace RankedSession
 			return;
 		}
 		MMRWrapper mmr = this->gameWrapper->GetMMRWrapper();
-		RankedPlaylist playlist = (RankedPlaylist)mmr.GetCurrentPlaylist();
-		this->resultViewer->Update(playlist);
+		if (!this->resultViewer->isInitialized)
+		{
+			this->resultViewer = new GameResultViewer(this->gameWrapper.get());
+		}
+		if (!this->statTracker->isInitialized)
+		{
+			this->statTracker = new StatTracker(this->gameWrapper.get());
+		}
 		this->drawResults = true;
-		this->statTracker->Update(playlist);
 		this->drawStats = true;
 	}
 

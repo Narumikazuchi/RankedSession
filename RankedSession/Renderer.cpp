@@ -33,6 +33,7 @@ namespace RankedSession
         int count = 0;
         for (const RankedPlaylist playlist : AvailablePlaylists)
         {
+            tracker->Update(playlist);
             Stats* stats = tracker->stats[playlist];
             if (stats->wins == 0 &&
                 stats->losses == 0)
@@ -59,6 +60,8 @@ namespace RankedSession
         {
             return;
         }
+
+        viewer->Update(playlist);
 
         Vector2 screen = canvas->GetSize();
         float fontSize = (float)screen.X / (float)1920;
@@ -208,7 +211,7 @@ namespace RankedSession
         canvas->SetPosition(Vector2{ position.X + 10, position.Y + 85 });
         canvas->DrawString("Streak:");
 
-        int streak = stats->streak;
+        int streak = stats->streak * (stats->wonLast ? 1 : -1);
         SetColorByValue(canvas, static_cast<float>(streak));
         canvas->SetPosition(Vector2{ position.X + 104, position.Y + 85 });
         stringStream.str("");
