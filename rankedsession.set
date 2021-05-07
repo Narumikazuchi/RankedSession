@@ -1,0 +1,10 @@
+Session Stats plugin
+9|This plugin will count wins/losses/mmr changes
+11|
+9|Stats display colors
+13|Background color|cl_session_plugin_background_color
+13|Title color|cl_session_plugin_title_color
+13|Label color|cl_session_plugin_label_color
+13|Positive color|cl_session_plugin_positive_color
+13|Negative color|cl_session_plugin_negative_color
+0|Reset colors|cl_session_plugin_reset_colors
