@@ -8,6 +8,19 @@ namespace RankedSession
 {
     const Vector2 boxSize = { 240, 208 };
 
+    Renderer::Renderer()
+    {
+        this->posX = std::make_shared<int>(0);
+        this->posY = std::make_shared<int>(0);
+        this->colorBackground = std::make_shared<LinearColor>(LinearColor());
+        this->colorTitle = std::make_shared<LinearColor>(LinearColor());
+        this->colorLabel = std::make_shared<LinearColor>(LinearColor());
+        this->colorPositive = std::make_shared<LinearColor>(LinearColor());
+        this->colorNegative = std::make_shared<LinearColor>(LinearColor());
+        this->wrapper = nullptr;
+        this->isInitialized = false;
+    }
+
     Renderer::Renderer(GameWrapper* wrapper)
     {
         this->posX = std::make_shared<int>(0);

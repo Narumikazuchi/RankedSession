@@ -70,6 +70,8 @@ namespace RankedSession
 			ResetColors();
 		}, "Reset to default colors", PERMISSION_ALL);
 
+		this->renderer = Renderer(this->gameWrapper.get());
+
 		this->gameWrapper->HookEventPost(HOOK_COUNTDOWN_BEGINSTATE, std::bind(&Plugin::Event_GameBegin, this, std::placeholders::_1));
 		this->gameWrapper->HookEventPost(HOOK_ON_WINNER_SET, std::bind(&Plugin::Event_GameConcluded, this, std::placeholders::_1));
 		this->gameWrapper->HookEventPost(HOOK_DESTROYED, std::bind(&Plugin::Event_GameLeft, this, std::placeholders::_1));
@@ -86,6 +88,7 @@ namespace RankedSession
 		this->gameWrapper->UnhookEventPost(HOOK_COUNTDOWN_BEGINSTATE);
 		this->gameWrapper->UnhookEventPost(HOOK_ON_WINNER_SET);
 		this->gameWrapper->UnhookEventPost(HOOK_DESTROYED);
+		this->renderer = Renderer();
 		this->resultViewer = nullptr;
 		this->statTracker = nullptr;
 		this->drawStats = false;

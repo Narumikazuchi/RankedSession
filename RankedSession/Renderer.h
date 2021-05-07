@@ -21,6 +21,7 @@ namespace RankedSession
 		std::shared_ptr<LinearColor> colorPositive;
 		std::shared_ptr<LinearColor> colorNegative;
 
+		Renderer();
 		Renderer(GameWrapper* wrapper);
 		void RenderSessionInfo(CanvasWrapper* canvas, StatTracker* tracker);
 		void RenderAfterGame(CanvasWrapper* canvas, GameResultViewer* viewer, const RankedPlaylist playlist);
