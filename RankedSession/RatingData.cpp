@@ -228,13 +228,13 @@ namespace RankedSession
 
     std::map<RankedPlaylist, RatingData&> PlaylistRatingDatabase =
     {
-        {RankedPlaylist::RANKED_DUEL,          Ones},
-        {RankedPlaylist::RANKED_DOUBLE,          Twos},
-        {RankedPlaylist::RANKED_STANDARD,        Threes},
-        {RankedPlaylist::RANKED_HOOPS,         Hoops},
-        {RankedPlaylist::RANKED_RUMBLE,        Rumble},
-        {RankedPlaylist::RANKED_DROPSHOT,      Dropshot},
-        {RankedPlaylist::RANKED_SNOWDAY,       Snowday},
-        {RankedPlaylist::TOURNAMENT,    Tournament}
+        {RankedPlaylist::RANKED_DUEL,       Ones},
+        {RankedPlaylist::RANKED_DOUBLE,     Twos},
+        {RankedPlaylist::RANKED_STANDARD,   Threes},
+        {RankedPlaylist::RANKED_HOOPS,      Hoops},
+        {RankedPlaylist::RANKED_RUMBLE,     Rumble},
+        {RankedPlaylist::RANKED_DROPSHOT,   Dropshot},
+        {RankedPlaylist::RANKED_SNOWDAY,    Snowday},
+        {RankedPlaylist::TOURNAMENT,        Tournament}
     };
 }

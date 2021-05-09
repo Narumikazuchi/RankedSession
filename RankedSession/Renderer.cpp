@@ -1,6 +1,7 @@
 #include <sstream>
 #include "bakkesmod/wrappers/canvaswrapper.h"
 #include "bakkesmod/wrappers/MMRWrapper.h"
+#include "Logger.h"
 #include "RankedData.h"
 #include "Renderer.h"
 
@@ -17,27 +18,6 @@ namespace RankedSession
         this->colorLabel = std::make_shared<LinearColor>(LinearColor());
         this->colorPositive = std::make_shared<LinearColor>(LinearColor());
         this->colorNegative = std::make_shared<LinearColor>(LinearColor());
-        this->wrapper = nullptr;
-        this->isInitialized = false;
-    }
-
-    Renderer::Renderer(GameWrapper* wrapper)
-    {
-        this->posX = std::make_shared<int>(0);
-        this->posY = std::make_shared<int>(0);
-        this->colorBackground = std::make_shared<LinearColor>(LinearColor());
-        this->colorTitle = std::make_shared<LinearColor>(LinearColor());
-        this->colorLabel = std::make_shared<LinearColor>(LinearColor());
-        this->colorPositive = std::make_shared<LinearColor>(LinearColor());
-        this->colorNegative = std::make_shared<LinearColor>(LinearColor());
-        if (wrapper == nullptr)
-        {
-            this->wrapper = nullptr;
-            this->isInitialized = false;
-            return;
-        }
-        this->wrapper = wrapper;
-        this->isInitialized = true;
     }
 
     void Renderer::RenderSessionInfo(CanvasWrapper* canvas, StatTracker* tracker)
@@ -56,7 +36,6 @@ namespace RankedSession
         int count = 0;
         for (const RankedPlaylist playlist : AvailablePlaylists)
         {
-            tracker->Update(playlist);
             Stats* stats = tracker->stats[playlist];
             if (stats->wins == 0 &&
                 stats->losses == 0)
@@ -83,8 +62,6 @@ namespace RankedSession
         {
             return;
         }
-
-        viewer->Update(playlist);
 
         Vector2 screen = canvas->GetSize();
         float fontSize = (float)screen.X / (float)1920;
@@ -150,9 +127,19 @@ namespace RankedSession
 
     void Renderer::PreLoadImages(GameWrapper* wrapper)
     {
-        for (int i = 0; i < 22; i++)
+        for (int i = 0; i <= 22; i++)
         {
             RankInfoDatabase[(Rank)i].image = std::make_shared<ImageWrapper>(wrapper->GetDataFolder().string() + "\\RankedSession\\" + RankInfoDatabase[(Rank)i].name + ".png", true);
+            RankInfoDatabase[(Rank)i].image->LoadForCanvas();
+            if (RankInfoDatabase[(Rank)i].image->LoadForCanvas())
+            {
+                RankInfoDatabase[(Rank)i].image->GetCanvasTex();
+                Log(RankInfoDatabase[(Rank)i].image->GetPath() + " loaded.");
+            }
+            else
+            {
+                Log(RankInfoDatabase[(Rank)i].image->GetPath() + " could not be loaded.");
+            }
         }
     }
 
@@ -249,23 +236,32 @@ namespace RankedSession
 
         // DRAW INITIAL RANK
         std::shared_ptr<ImageWrapper> image = RankInfoDatabase[stats->rating->initialRank].image;
-        canvas->SetColor(LinearColor{ 255, 255, 255 });
+        canvas->SetColor(LinearColor{ 255, 255, 255, 255 });
         canvas->SetPosition(Vector2{ position.X + 10, position.Y + 101 });
         if (image->IsLoadedForCanvas())
         {
             canvas->DrawTexture(image.get(), 1.f);
         }
+        else
+        {
+            Log("Renderer::RenderBox(CanvasWrapper*, Stats*, const Vector2, const std::string) - image not loaded for canvas");
+        }
 
-        canvas->SetPosition(Vector2{ position.X + 110, position.Y + 151 });
-        canvas->DrawString(">", 2.f, 2.f);
+        canvas->SetColor(*this->colorLabel);
+        canvas->SetPosition(Vector2{ position.X + 110, position.Y + 126 });
+        canvas->DrawString(">", 3.f, 3.f);
 
         // DRAW CURRENT RANK
         image = RankInfoDatabase[stats->rating->currentRank].image;
-        canvas->SetColor(LinearColor{ 255, 255, 255 });
+        canvas->SetColor(LinearColor{ 255, 255, 255, 255 });
         canvas->SetPosition(Vector2{ position.X + 130, position.Y + 101 });
         if (image->IsLoadedForCanvas())
         {
             canvas->DrawTexture(image.get(), 1.f);
+        }
+        else
+        {
+            Log("Renderer::RenderBox(CanvasWrapper*, Stats*, const Vector2, const std::string) - image not loaded for canvas");
         }
     }
 }

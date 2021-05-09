@@ -1,4 +1,5 @@
 #include "bakkesmod/wrappers/MMRWrapper.h"
+#include "Logger.h"
 #include "RatingTracker.h"
 
 namespace RankedSession
@@ -7,11 +8,19 @@ namespace RankedSession
 	{
 		if (wrapper == nullptr)
 		{
+			Log("RatingTracker::RequestUpdate(GameWrapper*, const RankedPlaylist) - GameWrapper pointer was null");
 			return RatingRequestResult::NOT_SYNCED;
 		}
 
 		UniqueIDWrapper id = wrapper->GetUniqueID();
 		MMRWrapper mmrWrapper = wrapper->GetMMRWrapper();
+
+		if (mmrWrapper.IsSyncing(id) ||
+			!mmrWrapper.IsSynced(id, (int)playlist))
+		{
+			return RatingRequestResult::NOT_SYNCED;
+		}
+
 		float mmr = mmrWrapper.GetPlayerMMR(id, (int)playlist);
 		Rank rank = (Rank)mmrWrapper.GetPlayerRank(id, (int)playlist).Tier;
 		if (this->currentRating == mmr)

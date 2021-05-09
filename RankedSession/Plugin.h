@@ -21,8 +21,11 @@ namespace RankedSession
 	private:
 		bool drawStats;
 		bool drawResults;
-		Renderer renderer;
-		GameResultViewer* resultViewer;
-		StatTracker* statTracker;
+		std::shared_ptr<Renderer> renderer;
+		std::shared_ptr<GameResultViewer> resultViewer;
+		std::shared_ptr<StatTracker> statTracker;
+
+		void SyncTracker(const int retries);
+		void UpdateTrackers(const int retries, const RankedPlaylist playlist);
 	};
 }

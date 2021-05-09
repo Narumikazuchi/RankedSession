@@ -1,4 +1,5 @@
 #include <iomanip>
+#include "Logger.h"
 #include "StatTracker.h"
 
 namespace RankedSession
@@ -9,33 +10,13 @@ namespace RankedSession
 		this->wins = 0;
 		this->streak = 0;
 		this->wonLast = false;
-		this->rating = new RatingTracker();
+		this->rating = std::make_shared<RatingTracker>();
 		this->rating->initialRating = 0;
 		this->rating->beforeRating = 0;
 		this->rating->currentRating = 0;
 		this->rating->initialRank = Rank::Unranked;
 		this->rating->beforeRank = Rank::Unranked;
 		this->rating->currentRank = Rank::Unranked;
-	}
-
-	Stats::Stats(MMRWrapper* wrapper, const UniqueIDWrapper id, const RankedPlaylist playlist)
-	{
-		this->rating = new RatingTracker();
-		this->rating->initialRating = 0.f;
-		this->rating->beforeRating = 0.f;
-		this->rating->currentRating = 0.f;
-		this->rating->initialRank = Rank::Unranked;
-		this->rating->beforeRank = Rank::Unranked;
-		this->rating->currentRank = Rank::Unranked;
-		this->losses = 0;
-		this->wins = 0;
-		this->streak = 0;
-		this->wonLast = false;
-		if (wrapper != nullptr)
-		{
-			this->rating->initialRating = this->rating->beforeRating = this->rating->currentRating = wrapper->GetPlayerMMR(id, (int)playlist);
-			this->rating->initialRank = this->rating->beforeRank = this->rating->currentRank = (Rank)wrapper->GetPlayerRank(id, (int)playlist).Tier;
-		}
 	}
 
 	void Stats::FormatStream(std::stringstream& stream, const StreamFormatStyle style)
@@ -59,9 +40,9 @@ namespace RankedSession
 		}
 	}
 
-	StatTracker::StatTracker(GameWrapper* wrapper)
+	StatTracker::StatTracker(std::shared_ptr<GameWrapper> wrapper)
 	{
-		if (wrapper == nullptr)
+		if (wrapper.get() == nullptr)
 		{
 			this->isInitialized = false;
 			this->wrapper = nullptr;
@@ -69,25 +50,82 @@ namespace RankedSession
 		}
 		this->wrapper = wrapper;
 		this->isInitialized = true;
+		this->synced = false;
 		UniqueIDWrapper id = this->wrapper->GetUniqueID();
 		MMRWrapper mmr = this->wrapper->GetMMRWrapper();
 		for (const RankedPlaylist playlist : AvailablePlaylists)
 		{
-			this->stats.insert(std::pair<RankedPlaylist, Stats*>(playlist, new Stats(&mmr, id, playlist)));
+			this->stats.insert(std::pair<RankedPlaylist, Stats*>(playlist, new Stats()));
 		}
 	}
 
-	void StatTracker::Update(const RankedPlaylist playlist)
+	RatingUpdateResult StatTracker::Sync()
 	{
 		if (!this->isInitialized)
 		{
-			return;
+			return RatingUpdateResult::NOT_INITIALIZED;
 		}
+
+		if (this->synced)
+		{
+			return RatingUpdateResult::SUCCESS;
+		}
+
+		MMRWrapper mmr = this->wrapper->GetMMRWrapper();
+		UniqueIDWrapper id = this->wrapper->GetUniqueID();
+		if (mmr.IsSyncing(id))
+		{
+			return RatingUpdateResult::NOT_SYNCED;
+		}
+		for (RankedPlaylist playlist : AvailablePlaylists)
+		{
+			if (!mmr.IsSynced(id, (int)playlist))
+			{
+				return RatingUpdateResult::NOT_SYNCED;
+			}
+		}
+
+		for (RankedPlaylist playlist : AvailablePlaylists)
+		{
+			float rating = mmr.GetPlayerMMR(id, (int)playlist);
+			Rank rank = (Rank)mmr.GetPlayerRank(id, (int)playlist).Tier;
+			if (this->stats[playlist] == nullptr)
+			{
+				continue;
+			}
+			this->stats[playlist]->rating->initialRating = rating;
+			this->stats[playlist]->rating->currentRating = rating;
+			this->stats[playlist]->rating->beforeRating = rating;
+			this->stats[playlist]->rating->initialRank = rank;
+			this->stats[playlist]->rating->currentRank = rank;
+			this->stats[playlist]->rating->beforeRank = rank;
+			Log("StatTracker::Sync() - initial Rating for playlist " + GetPlaylistName(playlist) + " = " + std::to_string(this->stats[playlist]->rating->initialRating));
+		}
+		this->synced = true;
+		return RatingUpdateResult::SUCCESS;
+	}
+
+	RatingUpdateResult StatTracker::Update(const RankedPlaylist playlist)
+	{
+		if (!this->isInitialized)
+		{
+			return RatingUpdateResult::NOT_INITIALIZED;
+		}
+
+		if (this->stats[playlist] == nullptr)
+		{
+			return RatingUpdateResult::INVALID_OPTION;
+		}
+
 		Stats* stats = this->stats[playlist];
 		UniqueIDWrapper id = this->wrapper->GetUniqueID();
 		MMRWrapper mmr = this->wrapper->GetMMRWrapper();
-		RatingRequestResult result = stats->rating->RequestUpdate(this->wrapper, playlist);
-		if (result == RatingRequestResult::SUCCESS_WIN)
+		RatingRequestResult result = stats->rating->RequestUpdate(this->wrapper.get(), playlist);
+		if (result == RatingRequestResult::NOT_SYNCED)
+		{
+			return RatingUpdateResult::NOT_SYNCED;
+		}
+		else if (result == RatingRequestResult::SUCCESS_WIN)
 		{
 			stats->wins++;
 			if (stats->wonLast)
@@ -113,5 +151,7 @@ namespace RankedSession
 			}
 			stats->wonLast = false;
 		}
+		Log("StatTracker::Update(const RankedPlaylist) - Update finished");
+		return RatingUpdateResult::SUCCESS;
 	}
 }

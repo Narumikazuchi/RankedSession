@@ -6,7 +6,7 @@
 
 namespace RankedSession
 {
-	enum class RankedPlaylist
+	enum RankedPlaylist
 	{
 		RANKED_DUEL = 10,
 		RANKED_DOUBLE = 11,
@@ -18,7 +18,7 @@ namespace RankedSession
 		TOURNAMENT = 34
 	};
 
-	enum class Rank
+	enum Rank
 	{
 		SupersonicLegend = 22,
 		GrandChamp3 = 21,
@@ -54,7 +54,8 @@ namespace RankedSession
 		std::shared_ptr<ImageWrapper> image;
 	};
 
-	std::string GetPlaylistName(const RankedSession::RankedPlaylist playlist);
+	std::string GetPlaylistName(const RankedPlaylist playlist);
+	std::string GetRankName(const Rank tier, const int division);
 
 	extern std::map<Rank, RankInfo> RankInfoDatabase;
 	extern std::vector<RankedPlaylist> AvailablePlaylists;
@@ -84,4 +85,22 @@ inline std::string RankedSession::GetPlaylistName(const RankedSession::RankedPla
 	default:
 		return "Unknown";
 	}
+}
+
+inline std::string RankedSession::GetRankName(const RankedSession::Rank tier, const int division)
+{
+	if (tier < 0 ||
+		tier > 22)
+	{
+		return "ERROR";
+	}
+
+	std::string rankName = RankedSession::RankInfoDatabase[tier].name;
+	if (tier != RankedSession::Rank::Unranked &&
+		tier != RankedSession::Rank::SupersonicLegend)
+	{
+		rankName += " Div " + std::to_string(division + 1);
+	}
+
+	return rankName;
 }

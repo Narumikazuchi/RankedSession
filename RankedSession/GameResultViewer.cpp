@@ -1,25 +1,24 @@
 #include "GameResultViewer.h"
+#include "Logger.h"
 
 namespace RankedSession
 {
-	GameResultViewer::GameResultViewer(GameWrapper* wrapper)
+	GameResultViewer::GameResultViewer(std::shared_ptr<GameWrapper> wrapper)
 	{
-		if (wrapper == nullptr)
-		{
-			this->isInitialized = false;
-		}
-		else
-		{
-			this->isInitialized = true;
-		}
-		this->wrapper = wrapper;
-		this->shouldDraw = false;
-		this->colorPrevious = std::make_shared<LinearColor>(LinearColor());
-		this->colorCurrent = std::make_shared<LinearColor>(LinearColor());
-		this->colorNext = std::make_shared<LinearColor>(LinearColor());
+		this->colorPrevious = std::make_shared<LinearColor>();
+		this->colorCurrent = std::make_shared<LinearColor>();
+		this->colorNext = std::make_shared<LinearColor>();
 		this->ratingPrevious = 0;
 		this->ratingCurrent = 0;
 		this->ratingNext = 0;
+		if (wrapper.get() == nullptr)
+		{
+			this->isInitialized = false;
+			this->wrapper = nullptr;
+			return;
+		}
+		this->isInitialized = true;
+		this->wrapper = wrapper;
 	}
 
 	bool GameResultViewer::IsPlacement(const RankedPlaylist playlist)
@@ -34,19 +33,18 @@ namespace RankedSession
 		return rank.Tier <= 0;
 	}
 
-	void GameResultViewer::Update(const RankedPlaylist playlist)
+	RatingUpdateResult GameResultViewer::Update(const RankedPlaylist playlist)
 	{
 		if (!this->isInitialized)
 		{
-			return;
+			return RatingUpdateResult::NOT_INITIALIZED;
 		}
 
 		// Ranked Check
 		MMRWrapper mmr = this->wrapper->GetMMRWrapper();
 		if (!mmr.IsRanked((int)playlist))
 		{
-			this->shouldDraw = false;
-			return;
+			return RatingUpdateResult::INVALID_OPTION;
 		}
 
 		// Game Check
@@ -55,25 +53,27 @@ namespace RankedSession
 			!server.IsOnlineMultiplayer() ||
 			this->wrapper->IsInReplay())
 		{
-			this->shouldDraw = false;
-			return;
+			return RatingUpdateResult::INVALID_OPTION;
 		}
 
 		// Placement Check
 		UniqueIDWrapper id = this->wrapper->GetUniqueID();
+		if (mmr.IsSyncing(id) ||
+			!mmr.IsSynced(id, (int)playlist))
+		{
+			return RatingUpdateResult::NOT_SYNCED;
+		}
 		this->ratingCurrent = (int)(round(mmr.GetPlayerMMR(id, (int)playlist)));
 		SkillRank rank = mmr.GetPlayerRank(id, (int)playlist);
 		int userTier = rank.Tier;
 		int userDivision = rank.Division;
 		if (rank.Tier <= 0)
 		{
-			this->shouldDraw = false;
-			return;
+			return RatingUpdateResult::INVALID_OPTION;
 		}
 
 		// Tier Data
-		this->shouldDraw = true;
-		this->tierCurrent = this->GetRankName(userTier, userDivision);
+		this->tierCurrent = GetRankName((Rank)userTier, userDivision);
 		this->SetRankColor(this->colorCurrent.get(), userTier);
 
 		int nextTier, prevTier;
@@ -93,7 +93,6 @@ namespace RankedSession
 			prevDiv = userDivision - 1;
 		}
 		else
-
 		{
 			nextTier = userTier;
 			prevTier = userTier;
@@ -103,17 +102,18 @@ namespace RankedSession
 
 		int diff = 0;
 		// Next Higher Tier
-		this->ratingNext = GetRatingLowerBound(playlist, nextTier, nextDiv);
+		this->ratingNext = this->GetRatingLowerBound(playlist, nextTier, nextDiv);
 		diff = this->ratingNext - this->ratingCurrent;
 		this->SetDifferenceString(&this->differenceNext, diff);
-		this->tierNext = this->GetRankName(nextTier, nextDiv);
+		this->tierNext = GetRankName((Rank)nextTier, nextDiv);
 		this->SetRankColor(this->colorNext.get(), nextTier);
 		// Next Lower Tier
-		this->ratingPrevious = GetRatingLowerBound(playlist, prevTier, prevDiv);
+		this->ratingPrevious = this->GetRatingLowerBound(playlist, prevTier, prevDiv);
 		diff = this->ratingPrevious - this->ratingCurrent;
 		this->SetDifferenceString(&this->differencePrevious, diff);
-		this->tierPrevious = this->GetRankName(prevTier, prevDiv);
+		this->tierPrevious = GetRankName((Rank)prevTier, prevDiv);
 		this->SetRankColor(this->colorPrevious.get(), prevTier);
+		return RatingUpdateResult::SUCCESS;
 	}
 
 	//
@@ -136,25 +136,6 @@ namespace RankedSession
 			}
 		}
 		return DivisionData();
-	}
-
-	std::string GameResultViewer::GetRankName(const int tier, const int division)
-	{
-		if (tier < 0 ||
-			tier > 22)
-		{
-			return "ERROR";
-		}
-
-		Rank realRank = (Rank)(tier);
-		std::string rankName = RankInfoDatabase[realRank].name;
-		if (realRank != Rank::Unranked &&
-			realRank != Rank::SupersonicLegend)
-		{
-			rankName += " Div " + std::to_string(division + 1);
-		}
-
-		return rankName;
 	}
 	
 	void GameResultViewer::SetRankColor(LinearColor* color, int tier)

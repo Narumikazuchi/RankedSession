@@ -16,14 +16,13 @@ namespace RankedSession
 	struct Stats
 	{
 	public:
-		RatingTracker* rating;
+		std::shared_ptr<RatingTracker> rating;
 		int wins;
 		int losses;
 		int streak;
 		bool wonLast;
 
 		Stats();
-		Stats(MMRWrapper* wrapper, const UniqueIDWrapper id, const RankedPlaylist playlist);
 		void FormatStream(std::stringstream& stream, const StreamFormatStyle style);
 	};
 
@@ -33,10 +32,12 @@ namespace RankedSession
 		std::map<RankedPlaylist, Stats*> stats;
 		bool isInitialized;
 
-		StatTracker(GameWrapper* wrapper);
-		void Update(const RankedPlaylist playlist);
+		StatTracker(std::shared_ptr<GameWrapper> wrapper);
+		RatingUpdateResult Sync();
+		RatingUpdateResult Update(const RankedPlaylist playlist);
 
 	private:
-		GameWrapper* wrapper;
+		std::shared_ptr<GameWrapper> wrapper;
+		bool synced;
 	};
 }

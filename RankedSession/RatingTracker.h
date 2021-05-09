@@ -27,4 +27,13 @@ namespace RankedSession
 		float GetSessionDifference();
 		float GetLastGameDifference();
 	};
+
+
+	enum class RatingUpdateResult
+	{
+		NOT_INITIALIZED = 0,
+		NOT_SYNCED = 1 << 1,
+		INVALID_OPTION = 1 << 2,
+		SUCCESS = 1 << 3
+	};
 }
