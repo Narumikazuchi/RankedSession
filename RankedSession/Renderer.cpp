@@ -43,7 +43,7 @@ namespace RankedSession
                 continue;
             }
             this->RenderBox(canvas, stats, position, GetPlaylistName(playlist));
-            if (count++ % 2 == 0)
+            if (count++ % 3 == 0)
             {
                 position.X += boxSize.X;
             }
