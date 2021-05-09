@@ -62,6 +62,9 @@ namespace RankedSession
 	{
 		RankedSession::manager = this->cvarManager;
 
+		this->renderer = std::make_shared<Renderer>();
+		this->renderer->PreLoadImages(this->gameWrapper.get());
+
 		this->cvarManager->registerCvar(CVAR_NAME_COLOR_BACKGROUND, "(0, 0, 0, 160)", "Background color", false, false, 0, false, 255, true).bindTo(this->renderer->colorBackground);
 		this->cvarManager->registerCvar(CVAR_NAME_COLOR_TITLE, "(255, 255, 255, 224)", "Title color", false, false, 0, false, 255, true).bindTo(this->renderer->colorTitle);
 		this->cvarManager->registerCvar(CVAR_NAME_COLOR_LABEL, "(255, 255, 255, 224)", "Label color", false, false, 0, false, 255, true).bindTo(this->renderer->colorLabel);
@@ -73,8 +76,6 @@ namespace RankedSession
 			ResetColors();
 		}, "Reset to default colors", PERMISSION_ALL);
 
-		this->renderer = std::make_shared<Renderer>();
-		this->renderer->PreLoadImages(this->gameWrapper.get());
 
 		this->gameWrapper->HookEventPost(HOOK_COUNTDOWN_BEGINSTATE, std::bind(&Plugin::Event_GameBegin, this, std::placeholders::_1));
 		this->gameWrapper->HookEventPost(HOOK_ON_WINNER_SET, std::bind(&Plugin::Event_GameConcluded, this, std::placeholders::_1));
