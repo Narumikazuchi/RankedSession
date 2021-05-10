@@ -12,7 +12,7 @@
 #define HOOK_ON_WINNER_SET "Function TAGame.GameEvent_Soccar_TA.EventMatchWinnerSet"
 #define HOOK_DESTROYED "Function TAGame.GameEvent_Soccar_TA.Destroyed"
 
-BAKKESMOD_PLUGIN(RankedSession::Plugin, "Rank Session Tracker", "1.0", 0)
+BAKKESMOD_PLUGIN(RankedSession::Plugin, "Rank Session Tracker", "1.1", 0)
 
 namespace RankedSession
 {

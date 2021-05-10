@@ -29,6 +29,11 @@ namespace RankedSession
 		}
 		MMRWrapper mmr = this->wrapper->GetMMRWrapper();
 		UniqueIDWrapper id = this->wrapper->GetUniqueID();
+		if (mmr.IsSyncing(id) ||
+			!mmr.IsSynced(id, playlist))
+		{
+			return true;
+		}
 		SkillRank rank = mmr.GetPlayerRank(id, (int)playlist);
 		return rank.Tier <= 0;
 	}
