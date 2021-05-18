@@ -29,6 +29,7 @@ namespace RankedSession
 
 	private:
 		std::shared_ptr<GameWrapper> wrapper;
+		std::map<RankedPlaylist, bool> placement;
 
 		DivisionData GetDivisionData(const RankedPlaylist playlist, const Rank rank, const int division);
 		void SetRankColor(LinearColor* color, int tier);

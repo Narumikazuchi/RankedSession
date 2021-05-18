@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include "RankedData.h"
 #include "GameResultViewer.h"
 #include "StatTracker.h"
 

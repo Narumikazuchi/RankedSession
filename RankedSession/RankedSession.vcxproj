@@ -27,6 +27,7 @@
     <ClInclude Include="RatingTracker.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="StatTracker.h" />
+    <ClInclude Include="Util.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameResultViewer.cpp" />

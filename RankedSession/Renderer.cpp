@@ -58,7 +58,8 @@ namespace RankedSession
     void Renderer::RenderAfterGame(CanvasWrapper* canvas, GameResultViewer* viewer, const RankedPlaylist playlist)
     {
         if (canvas == nullptr ||
-            viewer == nullptr)
+            viewer == nullptr ||
+            !IsPlaylistValid(playlist))
         {
             return;
         }

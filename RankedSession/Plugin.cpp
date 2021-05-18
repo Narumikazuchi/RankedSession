@@ -12,7 +12,7 @@
 #define HOOK_ON_WINNER_SET "Function TAGame.GameEvent_Soccar_TA.EventMatchWinnerSet"
 #define HOOK_DESTROYED "Function TAGame.GameEvent_Soccar_TA.Destroyed"
 
-BAKKESMOD_PLUGIN(RankedSession::Plugin, "Rank Session Tracker", "1.1", 0)
+BAKKESMOD_PLUGIN(RankedSession::Plugin, "Rank Session Tracker", "1.2", 0)
 
 namespace RankedSession
 {
@@ -97,13 +97,10 @@ namespace RankedSession
 		this->gameWrapper->UnhookEventPost(HOOK_ON_WINNER_SET);
 		this->gameWrapper->UnhookEventPost(HOOK_DESTROYED);
 
-		delete this->renderer.get();
-		delete this->resultViewer.get();
-		delete this->statTracker.get();
+		this->renderer.reset();
+		this->resultViewer.reset();
+		this->statTracker.reset();
 
-		this->renderer = nullptr;
-		this->resultViewer = nullptr;
-		this->statTracker = nullptr;
 		this->drawStats = false;
 		this->drawResults = false;
 	}
@@ -171,6 +168,10 @@ namespace RankedSession
 
 	void Plugin::UpdateTrackers(const int retries, const RankedPlaylist playlist)
 	{
+		if (!IsPlaylistValid(playlist))
+		{
+			return;
+		}
 		this->gameWrapper->SetTimeout([retries, playlist, this](GameWrapper* gameWrapper)
 		{
 			RatingUpdateResult gameResult = this->resultViewer->Update(playlist);

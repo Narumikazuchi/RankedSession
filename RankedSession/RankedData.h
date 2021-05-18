@@ -1,8 +1,8 @@
 #pragma once
 
 #include <string>
-#include <map>
 #include "bakkesmod/plugin/bakkesmodplugin.h"
+#include "Util.h"
 
 namespace RankedSession
 {
@@ -56,6 +56,7 @@ namespace RankedSession
 
 	std::string GetPlaylistName(const RankedPlaylist playlist);
 	std::string GetRankName(const Rank tier, const int division);
+	bool IsPlaylistValid(const RankedPlaylist playlist);
 
 	extern std::map<Rank, RankInfo> RankInfoDatabase;
 	extern std::vector<RankedPlaylist> AvailablePlaylists;
@@ -103,4 +104,9 @@ inline std::string RankedSession::GetRankName(const RankedSession::Rank tier, co
 	}
 
 	return rankName;
+}
+
+inline bool RankedSession::IsPlaylistValid(const RankedSession::RankedPlaylist playlist)
+{
+	return RankedSession::VectorHasItem(&RankedSession::AvailablePlaylists, playlist);
 }

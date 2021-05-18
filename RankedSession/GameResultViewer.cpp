@@ -11,6 +11,12 @@ namespace RankedSession
 		this->ratingPrevious = 0;
 		this->ratingCurrent = 0;
 		this->ratingNext = 0;
+		
+		for (RankedPlaylist playlist : AvailablePlaylists)
+		{
+			this->placement.insert(std::pair<RankedPlaylist, bool>(playlist, true));
+		}
+
 		if (wrapper.get() == nullptr)
 		{
 			this->isInitialized = false;
@@ -23,19 +29,13 @@ namespace RankedSession
 
 	bool GameResultViewer::IsPlacement(const RankedPlaylist playlist)
 	{
-		if (!this->isInitialized)
+		if (!this->isInitialized ||
+			!RankedSession::IsPlaylistValid(playlist))
 		{
 			return true;
 		}
-		MMRWrapper mmr = this->wrapper->GetMMRWrapper();
-		UniqueIDWrapper id = this->wrapper->GetUniqueID();
-		if (mmr.IsSyncing(id) ||
-			!mmr.IsSynced(id, playlist))
-		{
-			return true;
-		}
-		SkillRank rank = mmr.GetPlayerRank(id, (int)playlist);
-		return rank.Tier <= 0;
+
+		return this->placement[playlist];
 	}
 
 	RatingUpdateResult GameResultViewer::Update(const RankedPlaylist playlist)
@@ -47,10 +47,12 @@ namespace RankedSession
 
 		// Ranked Check
 		MMRWrapper mmr = this->wrapper->GetMMRWrapper();
-		if (!mmr.IsRanked((int)playlist))
+		if (!mmr.IsRanked((int)playlist) ||
+			!IsPlaylistValid(playlist))
 		{
 			return RatingUpdateResult::INVALID_OPTION;
 		}
+		this->placement[playlist] = true;
 
 		// Game Check
 		ServerWrapper server = this->wrapper->GetOnlineGame();
@@ -77,6 +79,7 @@ namespace RankedSession
 			return RatingUpdateResult::INVALID_OPTION;
 		}
 
+		this->placement[playlist] = false;
 		// Tier Data
 		this->tierCurrent = GetRankName((Rank)userTier, userDivision);
 		this->SetRankColor(this->colorCurrent.get(), userTier);

@@ -12,6 +12,11 @@ namespace RankedSession
 			return RatingRequestResult::NOT_SYNCED;
 		}
 
+		if (!IsPlaylistValid(playlist))
+		{
+			return RatingRequestResult::INVALID_VALUE;
+		}
+
 		UniqueIDWrapper id = wrapper->GetUniqueID();
 		MMRWrapper mmrWrapper = wrapper->GetMMRWrapper();
 

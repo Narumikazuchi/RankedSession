@@ -85,9 +85,15 @@ namespace RankedSession
 			}
 		}
 
+		bool zero_sync = true;
 		for (RankedPlaylist playlist : AvailablePlaylists)
 		{
 			float rating = mmr.GetPlayerMMR(id, (int)playlist);
+			if (zero_sync &&
+				rating == 0.f)
+			{
+				zero_sync = false;
+			}
 			Rank rank = (Rank)mmr.GetPlayerRank(id, (int)playlist).Tier;
 			if (this->stats[playlist] == nullptr)
 			{
@@ -101,8 +107,8 @@ namespace RankedSession
 			this->stats[playlist]->rating->beforeRank = rank;
 			Log("StatTracker::Sync() - initial Rating for playlist " + GetPlaylistName(playlist) + " = " + std::to_string(this->stats[playlist]->rating->initialRating));
 		}
-		this->synced = true;
-		return RatingUpdateResult::SUCCESS;
+		this->synced = zero_sync;
+		return zero_sync ? RatingUpdateResult::SUCCESS : RatingUpdateResult::NOT_SYNCED;
 	}
 
 	RatingUpdateResult StatTracker::Update(const RankedPlaylist playlist)
@@ -112,7 +118,8 @@ namespace RankedSession
 			return RatingUpdateResult::NOT_INITIALIZED;
 		}
 
-		if (this->stats[playlist] == nullptr)
+		if (!RankedSession::IsPlaylistValid(playlist) ||
+			this->stats[playlist] == nullptr)
 		{
 			return RatingUpdateResult::INVALID_OPTION;
 		}
